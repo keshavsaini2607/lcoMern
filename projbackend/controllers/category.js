@@ -1,4 +1,8 @@
 const Category = require("../models/category")
+//formidable is npm package for post form data 'in DB
+const formidable = require("formidable")
+//another npmm stuff
+const _ = require("lodash")
 
 exports.getCategoryById = (req,res,next,id) =>{
 
@@ -18,7 +22,7 @@ exports.createCategory = (req,res) =>{
     category.save((err,category)=>{
         if(err){
             return res.status(400).json({
-                error: "Not able to save category in DB"
+                error: err
             })
         }
         res.json({category})
@@ -30,7 +34,7 @@ exports.getCategory = (req,res) =>{
 }
 
 exports.getAllCategories = (req,res) => {
-    Category.find(),exec((err,categories)=> {
+    Category.find().exec((err,categories)=> {
         if(err){
             return res.status(400).json({
                 error: "No categories found"
@@ -40,21 +44,28 @@ exports.getAllCategories = (req,res) => {
     })
 }
 
-exports.updateCategory = (req,res) => {
-    //we are able to get this req.category because of the middleware getCategoryById 
-    const category = req.category
-    //category.name is getting populated either from the frontend or from the postman
-    category.name = req.body.name
+exports.updateCategory = (req, res) => {
+    const category = req.category;
 
-    category.save((err,updatedCateory)=>{
-        if(err){
-            return res.status(400).json({
-                error: "Category is not updated"
-            })
+
+    category.name = req.body.name;
+
+
+    category.save( (error, updatedcategory) => {
+        if(error) {
+            return res.status(400).json(
+                {
+                    error: "FAILED TO UPDATE CATEGORY"
+                }
+            )
         }
-        res.json(updatedCateory)
-    })
+        console.log(updatedcategory);
+        res.json(updatedcategory);
+    } )
 }
+
+
+
 
 exports.removeCategory = (req,res) =>{
     const category = req.category
